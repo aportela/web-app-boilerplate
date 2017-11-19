@@ -6,9 +6,8 @@
             'displayErrorDetails' => true, // set to false in production
             'addContentLengthHeader' => false, // Allow the web server to send the content-length header
             'twigParams' => [
-                'siteUrl' => "http://localhost",
                 'production' => false,
-                'localVendorAssets' => true, // use local vendor assets (vs remote cdn)
+                'localVendorAssets' => true // use local vendor assets (vs remote cdn)
             ],
             // Renderer settings
             'renderer' => [
@@ -16,10 +15,15 @@
             ],
             // Monolog settings
             'logger' => [
-                'name' => 'slim-app',
-                'path' => isset($_ENV['docker']) ? 'php://stdout' : __DIR__ . '/../logs/app.log',
-                'level' => \Monolog\Logger::DEBUG,
+                'name' => 'foobar-app',
+                'path' => isset($_ENV['docker']) ? 'php://stdout' : __DIR__ . '/../logs/default.log',
+                'level' => \Monolog\Logger::DEBUG
             ],
+            'apiLogger' => [
+                'name' => 'foobar-api',
+                'path' => isset($_ENV['docker']) ? 'php://stdout' : __DIR__ . '/../logs/api.log',
+                'level' => \Monolog\Logger::DEBUG
+            ]
         ],
     ];
 ?>
