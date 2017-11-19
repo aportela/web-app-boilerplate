@@ -9,6 +9,12 @@
                 'production' => false,
                 'localVendorAssets' => true // use local vendor assets (vs remote cdn)
             ],
+            // database settings
+            'database' => [
+                'connectionString' => sprintf("sqlite:%s", dirname(__DIR__) . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR . "foobar.sqlite3"),
+                'username' => '',
+                'password' => ''
+            ],
             // Renderer settings
             'renderer' => [
                 'template_path' => __DIR__ . '/../templates',
@@ -17,6 +23,11 @@
             'logger' => [
                 'name' => 'foobar-app',
                 'path' => isset($_ENV['docker']) ? 'php://stdout' : __DIR__ . '/../logs/default.log',
+                'level' => \Monolog\Logger::DEBUG
+            ],
+            'databaseLogger' => [
+                'name' => 'foobar-db',
+                'path' => isset($_ENV['docker']) ? 'php://stdout' : __DIR__ . '/../logs/database.log',
                 'level' => \Monolog\Logger::DEBUG
             ],
             'apiLogger' => [

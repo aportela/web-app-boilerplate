@@ -22,6 +22,18 @@
         return ($logger);
     };
 
+    $container['databaseLogger'] = function ($c) {
+        $settings = $c->get('settings')['databaseLogger'];
+        $logger = new \Monolog\Logger($settings['name']);
+        $logger->pushProcessor(new \Monolog\Processor\UidProcessor());
+        $handler = new \Monolog\Handler\RotatingFileHandler($settings['path'], 0, $settings['level']);
+        $handler->setFilenameFormat('{date}/{filename}', \Monolog\Handler\RotatingFileHandler::FILE_PER_DAY);
+        $formatter = new \Monolog\Formatter\LineFormatter(null, null, true, true);
+        $handler->setFormatter($formatter);
+        $logger->pushHandler($handler);
+        return ($logger);
+    };
+
     $container['apiLogger'] = function ($c) {
         $settings = $c->get('settings')['apiLogger'];
         $logger = new \Monolog\Logger($settings['name']);
