@@ -6,7 +6,7 @@
  */
 const foobarAPI = {
     poll: function (callback) {
-        Vue.http.get(siteUrl + "/api/poll").then(
+        Vue.http.get("api/poll").then(
             response => {
                 callback(response);
             },
