@@ -9,7 +9,7 @@
     $app = (new \Foobar\App())->get();
 
     $actualVersion = 0;
-    $v = new \Foobar\Database\Version(new \Foobar\Database\DB());
+    $v = new \Foobar\Database\Version(new \Foobar\Database\DB($app->getContainer()));
     try {
         $actualVersion = $v->get();
     } catch (\Foobar\Exception\NotFoundException $e) {
