@@ -7,27 +7,48 @@
       class Version {
 
         private $dbh;
+        private $databaseType;
 
         private $installQueries = array(
-            '
-                CREATE TABLE [VERSION] (
-                    [num]	NUMERIC NOT NULL UNIQUE,
-                    [date]	INTEGER NOT NULL,
-                    PRIMARY KEY([num])
-                );
-            ',
-            '
-                INSERT INTO VERSION VALUES (1.00, current_timestamp);
-            ',
-            '
-                PRAGMA journal_mode=WAL;
-            '
+            "PDO_SQLITE" => array(
+                '
+                    CREATE TABLE [VERSION] (
+                        [num]	NUMERIC NOT NULL UNIQUE,
+                        [date]	INTEGER NOT NULL,
+                        PRIMARY KEY([num])
+                    );
+                ',
+                '
+                    INSERT INTO VERSION VALUES ("1.00", current_timestamp);
+                ',
+                '
+                    PRAGMA journal_mode=WAL;
+                '
+            ),
+            "PDO_MARIADB" => array(
+                    '
+                    CREATE TABLE `VERSION` (
+                        `num`	FLOAT NOT NULL UNIQUE,
+                        `date`	TIMESTAMP NOT NULL,
+                        PRIMARY KEY(`num`)
+                    );
+                ',
+                '
+                    INSERT INTO `VERSION` VALUES ("1.00", utc_timestamp);
+                '
+            )
         );
 
-        private $upgradeQueries = array();
+        private $upgradeQueries = array(
+            "PDO_SQLITE" => array(
+            ),
+            "PDO_MARIADB" => array(
+            )
+        );
 
-        public function __construct (\Foobar\Database\DB $dbh) {
+        public function __construct (\Foobar\Database\DB $dbh, string $databaseType) {
             $this->dbh = $dbh;
+            $this->databaseType = $databaseType;
         }
 
         public function __destruct() { }
@@ -44,7 +65,7 @@
 
         private function set(float $number) {
             $params = array(
-                (new \Foobar\Database\DBParam())->float(":num", $number)
+                (new \Foobar\Database\DBParam())->str(":num", (string) $number)
             );
             $query = '
                 INSERT INTO VERSION
@@ -56,44 +77,53 @@
         }
 
         public function install() {
-            foreach($this->installQueries as $query) {
-                $this->dbh->execute($query);
+            if (isset($this->installQueries[$this->databaseType])) {
+                foreach($this->installQueries[$this->databaseType] as $query) {
+                    $this->dbh->execute($query);
+                }
+            } else {
+                throw new \Exception("Unsupported database type: " . $this->databaseType);
             }
         }
 
         public function upgrade() {
-            $result = array(
-                "successVersions" => array(),
-                "failedVersions" => array()
-            );
-            $actualVersion = $this->get();
-            $errors = false;
-            foreach($this->upgradeQueries as $version => $queries) {
-                if (! $errors && $version > $actualVersion) {
-                    try {
-                        $this->dbh->beginTransaction();
-                        foreach($queries as $query) {
-                            $this->dbh->execute($query);
+            if (isset($this->upgradeQueries[$this->databaseType])) {
+                $result = array(
+                    "successVersions" => array(),
+                    "failedVersions" => array()
+                );
+                $actualVersion = $this->get();
+                $errors = false;
+                foreach($this->upgradeQueries[$this->databaseType] as $version => $queries) {
+                    if (! $errors && $version > $actualVersion) {
+                        try {
+                            $this->dbh->beginTransaction();
+                            foreach($queries as $query) {
+                                $this->dbh->execute($query);
+                            }
+                            $this->set(floatval($version));
+                            $this->dbh->commit();
+                            $result["successVersions"][] = $version;
+                        } catch (\PDOException $e) {
+                            echo $e->getMessage();
+                            $this->dbh->rollBack();
+                            $errors = true;
+                            $result["failedVersions"][] = $version;
                         }
-                        $this->set(floatval($version));
-                        $this->dbh->commit();
-                        $result["successVersions"][] = $version;
-                    } catch (\PDOException $e) {
-                        $this->dbh->rollBack();
-                        $errors = true;
+                    } else if ($errors) {
                         $result["failedVersions"][] = $version;
                     }
-                } else if ($errors) {
-                    $result["failedVersions"][] = $version;
                 }
+                return($result);
+            } else {
+                throw new \Exception("Unsupported database type: " . $this->databaseType);
             }
-            return($result);
         }
 
         public function hasUpgradeAvailable() {
             $actualVersion = $this->get();
             $errors = false;
-            foreach($this->upgradeQueries as $version => $queries) {
+            foreach($this->upgradeQueries[$this->databaseType] as $version => $queries) {
                 if ($version > $actualVersion) {
                     return(true);
                 }

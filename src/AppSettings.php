@@ -9,11 +9,15 @@
                 'production' => false,
                 'localVendorAssets' => true // use local vendor assets (vs remote cdn)
             ],
+            'phpRequiredExtensions' => array('pdo_sqlite', 'mbstring', 'curl'),
             // database settings
             'database' => [
-                'connectionString' => sprintf("sqlite:%s", dirname(__DIR__) . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR . "foobar.sqlite3"),
+                'type' => "PDO_SQLITE", // supported types: PDO_SQLITE | PDO_MARIADB
+                'name' => "foobar",
                 'username' => '',
-                'password' => ''
+                'password' => '',
+                'host' => 'localhost',
+                'port' => 3306,
             ],
             // Renderer settings
             'renderer' => [

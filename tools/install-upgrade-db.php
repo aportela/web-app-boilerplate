@@ -8,8 +8,15 @@
 
     $app = (new \Foobar\App())->get();
 
+    $missingExtensions = array_diff($app->getContainer()["settings"]["phpRequiredExtensions"], get_loaded_extensions());
+    if (count($missingExtensions) > 0) {
+        echo "Error: missing php extension/s: " . implode(", ", $missingExtensions) . PHP_EOL;
+        exit;
+    }
+
     $actualVersion = 0;
-    $v = new \Foobar\Database\Version(new \Foobar\Database\DB($app->getContainer()));
+    $container = $app->getContainer();
+    $v = new \Foobar\Database\Version(new \Foobar\Database\DB($container), $container->get("settings")['database']['type']);
     try {
         $actualVersion = $v->get();
     } catch (\Foobar\Exception\NotFoundException $e) {
