@@ -11,7 +11,7 @@ var foobar = (function () {
                         <h1 class="title has-text-centered">Foobar</h1>
                         <h2 class="subtitle is-6 has-text-centered">success!</h2>
                         <p class="has-text-centered">
-                            <a href="https://github.com/aportela/web-app-boilerplate"><span class="icon is-small"><i class="fa fa-github"></i></span>Project page</a> | <a href="mailto:766f6964+github@gmail.com">by alex</a>
+                            <a href="https://github.com/aportela/web-app-boilerplate"><span class="icon is-small"><i class="fab fa-github"></i></span>Project page</a> | <a href="mailto:766f6964+github@gmail.com">by alex</a>
                         </p>
                     </div>
                 </div>
