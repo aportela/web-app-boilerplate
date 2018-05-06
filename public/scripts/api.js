@@ -8,10 +8,14 @@ const foobarAPI = {
     poll: function (callback) {
         Vue.http.get("api/poll").then(
             response => {
-                callback(response);
+                if (callback && typeof callback === "function") {
+                    callback(response);
+                }
             },
             response => {
-                callback(response);
+                if (callback && typeof callback === "function") {
+                    callback(response);
+                }
             }
         );
     }
