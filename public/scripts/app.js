@@ -1,23 +1,5 @@
-"use strict";
-
-/**
- * global object for events between vuejs components
- */
-const bus = new Vue();
-
-/**
- * vue-router route definitions
- */
-const routes = [
-    { path: '/foobar', name: 'foobar', component: foobar },
-];
-
-/**
- * main vue-router component inicialization
- */
-const router = new VueRouter({
-    routes
-});
+import { bus } from './modules/bus.js';
+import { router as router } from './modules/router.js';
 
 /**
  * top scroll window before change router page
@@ -80,7 +62,6 @@ const app = new Vue({
     router,
     data: function () {
         return ({
-            loading: false,
         });
     },
     created: function () {

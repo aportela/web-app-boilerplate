@@ -1,10 +1,8 @@
-"use strict";
-
 /**
  * common object for interact with API
  * all methods return callback with vue-resource response object
  */
-const foobarAPI = {
+export default {
     poll: function (callback) {
         Vue.http.get("api/poll").then(
             response => {
@@ -19,4 +17,4 @@ const foobarAPI = {
             }
         );
     }
-};
+}
