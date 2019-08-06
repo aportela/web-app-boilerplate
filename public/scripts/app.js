@@ -1,4 +1,3 @@
-import { bus } from './modules/bus.js';
 import { router as router } from './modules/router.js';
 
 /**
